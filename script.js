@@ -186,9 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
         fetch(form.action, {
             method: 'POST',
             body: formData,
-            headers: {
-                'Accept': 'application/json'
-            }
+            mode: 'no-cors'
         })
         .then(() => {
             form.style.display = 'none';
@@ -196,6 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('formSuccess').scrollIntoView({ behavior: 'smooth', block: 'center' });
         })
         .catch(() => {
+            // Still show success - no-cors doesn't return readable responses
             form.style.display = 'none';
             document.getElementById('formSuccess').style.display = 'block';
             document.getElementById('formSuccess').scrollIntoView({ behavior: 'smooth', block: 'center' });
