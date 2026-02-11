@@ -4,6 +4,111 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
+    // --- Sticky Nav (show after scrolling past hero) ---
+    const nav = document.getElementById('nav');
+    const hero = document.querySelector('.hero');
+
+    function handleNav() {
+        const heroBottom = hero.offsetTop + hero.offsetHeight;
+        if (window.scrollY > heroBottom - 100) {
+            nav.classList.add('visible');
+        } else {
+            nav.classList.remove('visible');
+        }
+    }
+
+    window.addEventListener('scroll', handleNav, { passive: true });
+
+
+    // --- Hero Parallax ---
+    const heroBg = document.querySelector('.hero-bg');
+
+    function handleParallax() {
+        if (window.scrollY < window.innerHeight) {
+            const offset = window.scrollY * 0.4;
+            heroBg.style.transform = `translateY(${offset}px) scale(1.1)`;
+        }
+    }
+
+    window.addEventListener('scroll', handleParallax, { passive: true });
+    heroBg.style.transform = 'scale(1.1)';
+
+
+    // --- Scroll Reveal Animations ---
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                // Add stagger delay for grid children
+                const delay = entry.target.dataset.delay || 0;
+                entry.target.style.transitionDelay = `${delay}s`;
+                entry.target.classList.add('visible');
+                revealObserver.unobserve(entry.target);
+            }
+        });
+    }, {
+        threshold: 0.1,
+        rootMargin: '0px 0px -60px 0px'
+    });
+
+    // Section headings - fade up
+    document.querySelectorAll('.section-heading, .section-sub, .section-cta-text').forEach(el => {
+        el.classList.add('reveal');
+        revealObserver.observe(el);
+    });
+
+    // Pain cards - staggered fade up
+    document.querySelectorAll('.pain-card').forEach((el, i) => {
+        el.classList.add('reveal');
+        el.dataset.delay = (i * 0.1).toFixed(1);
+        revealObserver.observe(el);
+    });
+
+    // Offer cards - staggered fade up
+    document.querySelectorAll('.offer-card').forEach((el, i) => {
+        el.classList.add('reveal');
+        el.dataset.delay = (i * 0.1).toFixed(1);
+        revealObserver.observe(el);
+    });
+
+    // Step cards - staggered fade up
+    document.querySelectorAll('.step-card').forEach((el, i) => {
+        el.classList.add('reveal');
+        el.dataset.delay = (i * 0.15).toFixed(2);
+        revealObserver.observe(el);
+    });
+
+    // About section - images slide from left, text slides from right
+    document.querySelectorAll('.about-images').forEach(el => {
+        el.classList.add('reveal-left');
+        revealObserver.observe(el);
+    });
+
+    document.querySelectorAll('.about-text').forEach(el => {
+        el.classList.add('reveal-right');
+        revealObserver.observe(el);
+    });
+
+    // FAQ items - staggered fade up
+    document.querySelectorAll('.faq-item').forEach((el, i) => {
+        el.classList.add('reveal');
+        el.dataset.delay = (i * 0.08).toFixed(2);
+        revealObserver.observe(el);
+    });
+
+    // Scarcity sections - scale reveal
+    document.querySelectorAll('#spots .section-heading, #spots .scarcity-text, #final-cta .section-heading, #final-cta .scarcity-text').forEach(el => {
+        el.classList.remove('reveal');
+        el.classList.add('reveal-scale');
+        revealObserver.observe(el);
+    });
+
+    // Form section
+    document.querySelectorAll('.coaching-form').forEach(el => {
+        el.classList.add('reveal');
+        revealObserver.observe(el);
+    });
+
+
     // --- Multi-step form ---
     const form = document.getElementById('coachingForm');
     const steps = form.querySelectorAll('.form-step');
@@ -30,7 +135,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const checked = currentStepEl.querySelector(`input[name="${name}"]:checked`);
                 if (!checked) {
                     valid = false;
-                    // Highlight the radio group
                     const group = field.closest('.radio-group');
                     if (group) {
                         group.style.outline = '1px solid #e74c3c';
@@ -52,7 +156,6 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', () => {
             if (validateStep(currentStep)) {
                 showStep(currentStep + 1);
-                // Scroll to form top
                 form.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         });
@@ -78,7 +181,6 @@ document.addEventListener('DOMContentLoaded', () => {
         submitBtn.textContent = 'SUBMITTING...';
         submitBtn.disabled = true;
 
-        // Collect form data
         const formData = new FormData(form);
 
         fetch(form.action, {
@@ -88,14 +190,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 'Accept': 'application/json'
             }
         })
-        .then(response => {
-            // Show success regardless (formsubmit.co may redirect)
+        .then(() => {
             form.style.display = 'none';
             document.getElementById('formSuccess').style.display = 'block';
             document.getElementById('formSuccess').scrollIntoView({ behavior: 'smooth', block: 'center' });
         })
         .catch(() => {
-            // Show success anyway - formsubmit.co can be finicky with CORS
             form.style.display = 'none';
             document.getElementById('formSuccess').style.display = 'block';
             document.getElementById('formSuccess').scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -110,11 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const question = item.querySelector('.faq-question');
         question.addEventListener('click', () => {
             const isActive = item.classList.contains('active');
-
-            // Close all
             faqItems.forEach(i => i.classList.remove('active'));
-
-            // Open clicked (if it wasn't already open)
             if (!isActive) {
                 item.classList.add('active');
             }
@@ -132,37 +228,4 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
-
-
-    // --- Scroll animations (subtle fade-in) ---
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-                observer.unobserve(entry.target);
-            }
-        });
-    }, observerOptions);
-
-    // Add animation classes
-    const animateElements = document.querySelectorAll(
-        '.pain-card, .offer-card, .step-card, .faq-item, .about-text, .about-images'
-    );
-
-    animateElements.forEach(el => {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(20px)';
-        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-        observer.observe(el);
-    });
-
-    // CSS class for visible state
-    const style = document.createElement('style');
-    style.textContent = '.visible { opacity: 1 !important; transform: translateY(0) !important; }';
-    document.head.appendChild(style);
 });
