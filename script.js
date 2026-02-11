@@ -182,11 +182,15 @@ document.addEventListener('DOMContentLoaded', () => {
         submitBtn.disabled = true;
 
         const formData = new FormData(form);
+        const urlEncoded = new URLSearchParams(formData).toString();
 
         fetch(form.action, {
             method: 'POST',
-            body: formData,
-            mode: 'no-cors'
+            body: urlEncoded,
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
         })
         .then(() => {
             form.style.display = 'none';
