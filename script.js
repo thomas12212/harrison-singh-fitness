@@ -168,41 +168,24 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Form submission
+    // Form submission - native submit to hidden iframe
     form.addEventListener('submit', (e) => {
         if (!validateStep(currentStep)) {
             e.preventDefault();
             return;
         }
 
-        e.preventDefault();
-
+        // Let the form submit natively to the hidden iframe
         const submitBtn = form.querySelector('.btn-submit');
         submitBtn.textContent = 'SUBMITTING...';
         submitBtn.disabled = true;
 
-        const formData = new FormData(form);
-        const urlEncoded = new URLSearchParams(formData).toString();
-
-        fetch(form.action, {
-            method: 'POST',
-            body: urlEncoded,
-            mode: 'no-cors',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
-        })
-        .then(() => {
+        // Show success after a short delay (form submits in background via iframe)
+        setTimeout(() => {
             form.style.display = 'none';
             document.getElementById('formSuccess').style.display = 'block';
             document.getElementById('formSuccess').scrollIntoView({ behavior: 'smooth', block: 'center' });
-        })
-        .catch(() => {
-            // Still show success - no-cors doesn't return readable responses
-            form.style.display = 'none';
-            document.getElementById('formSuccess').style.display = 'block';
-            document.getElementById('formSuccess').scrollIntoView({ behavior: 'smooth', block: 'center' });
-        });
+        }, 1500);
     });
 
 
